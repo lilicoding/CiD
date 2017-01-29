@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lu.uni.snt.mining4u.AndroidClasses;
-import lu.uni.snt.mining4u.utils.MethodSignature;
 import soot.Body;
 import soot.BodyTransformer;
 import soot.G;

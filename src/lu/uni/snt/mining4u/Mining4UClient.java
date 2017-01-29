@@ -1,17 +1,22 @@
 package lu.uni.snt.mining4u;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
 
 import lu.uni.snt.mining4u.api.APIExtractor;
 import lu.uni.snt.mining4u.api.APILife;
-import lu.uni.snt.mining4u.ari.AndroidSDKVersionChecker;
-import lu.uni.snt.mining4u.ari.ConditionalCallGraph;
+import lu.uni.snt.mining4u.ccg.AndroidSDKVersionChecker;
+import lu.uni.snt.mining4u.ccg.ConditionalCallGraph;
 import lu.uni.snt.mining4u.dcl.DexHunter;
 
 public class Mining4UClient 
 {
 	public static final int LATEST_API_LEVEL = 25;
-	
+	public static final int DEFAULT_API_LEVEL = 19;
 	
 	public static void main(String[] args) 
 	{
@@ -50,22 +55,61 @@ public class Mining4UClient
 		//(4) SDK check study
 		AndroidSDKVersionChecker.scan(apkPath, androidJars);
 		
+		
+		System.out.println("--------------------------------------------------------------------------------------------------------");
+		
+		
 		System.out.println("Declared Min Sdk version is: " + manifest.getMinSdkVersion());
 		System.out.println("Declared Target Sdk version is: " + manifest.getTargetSdkVersion());
 		System.out.println("Declared Max Sdk version is: " + manifest.getMaxSdkVersion());
 		
-		for (String method : extractor.primaryAPIs)
+		System.out.println("Collected " + extractor.primaryAPIs.size() + " " + "Android APIs in the primary DEX file");
+		System.out.println("Collected " + extractor.secondaryAPIs.size() + " " + "Android APIs in the secondary DEX files");
+		
+		Set<APILife> problematicAPIs = new HashSet<APILife>();
+		Set<APILife> protectedAPIs = new HashSet<APILife>();
+		
+		for (String method : extractor.usedAndroidAPIs)
 		{
 			APILife lifetime = AndroidAPILifeModel.getInstance().getLifetime(method);
-			
+
 			if (lifetime.getMinAPILevel() > minAPILevel || lifetime.getMaxAPILevel() < maxAPILevel)
 			{
-				System.out.println("==>" + method + "[" + lifetime.getMinAPILevel() + ", " + lifetime.getMaxAPILevel() + "]");
 				System.out.println(ConditionalCallGraph.obtainConditions(method));
-				System.out.println(ConditionalCallGraph.obtainCallStack(method));
+				
+				if (ConditionalCallGraph.obtainConditions(method).isEmpty())
+				{
+					problematicAPIs.add(lifetime);
+				}
+				else
+				{
+					protectedAPIs.add(lifetime);
+				}
+				
+				//System.out.println("==>" + method + "[" + lifetime.getMinAPILevel() + ", " + lifetime.getMaxAPILevel() + "]");
+				//System.out.println(ConditionalCallGraph.obtainConditions(method));
+				//System.out.println(ConditionalCallGraph.obtainCallStack(method));
 			}
 		}
 		
+		System.out.println("Found " + protectedAPIs.size() + " Android APIs that are problematic but are accessed with protection (SDK Check)");
+		System.out.println("Found " + problematicAPIs.size() + " Android APIs that are problematically accessed");
+		
+		for (APILife lifetime : protectedAPIs)
+		{
+			System.out.println("==>" + lifetime);
+			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
+			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
+		}
+		
+		for (APILife lifetime : problematicAPIs)
+		{
+			System.out.println("==>" + lifetime);
+			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
+			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
+		}
+		
+		clean(apkName);
 		//(4) Extracting the SDK version checks
 		//Map<String, APISDKCheck> method2SDKChecks = AndroidSDKVersionChecker.scan(apkPath, androidJars);
 		
@@ -145,11 +189,23 @@ public class Mining4UClient
 		{
 			apiLevel = manifest.getMaxSdkVersion();
 		}
-		else if (-1 != manifest.getMinSdkVersion())
+		else
 		{
-			apiLevel = manifest.getMinSdkVersion();
+			apiLevel = DEFAULT_API_LEVEL;
 		}
 		
 		return apiLevel;
+	}
+	
+	public static void clean(String apkName)
+	{
+		try 
+		{
+			FileUtils.deleteDirectory(new File(apkName + ".unzip"));
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
 	}
 }

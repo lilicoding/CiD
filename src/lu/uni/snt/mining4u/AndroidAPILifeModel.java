@@ -8,13 +8,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import lu.uni.snt.mining4u.api.APILife;
-import lu.uni.snt.mining4u.build.APISDKCheck;
-import lu.uni.snt.mining4u.methodextractor.FrameworkBase;
 import lu.uni.snt.mining4u.utils.CommonUtils;
 import lu.uni.snt.mining4u.utils.MethodSignature;
 
@@ -26,8 +23,20 @@ public class AndroidAPILifeModel implements Serializable
 	public Map<String, Set<String>> class2Methods = new HashMap<String, Set<String>>();
 	public Map<String, APILife> method2APILifes = new HashMap<String, APILife>();
 	
+	//For such APIs that contain generic types or contain varargs.
+	public Map<String, Set<String>> compactSig2Methods = new HashMap<String, Set<String>>();
+	
+	//compactSig2Methods = compactSig2Methods_gt U compactSig2Methods_varargs
+	public Map<String, Set<String>> compactSig2Methods_gt = new HashMap<String, Set<String>>();
+	public Map<String, Set<String>> compactSig2Methods_varargs = new HashMap<String, Set<String>>();
+	
 	private static AndroidAPILifeModel instance = null;
-	private static final String modelPath = "res/apilife.model";
+	private static String modelPath = "res/android_api_model.txt";
+	
+	private String lifetimeAPIPath = "res/android_api_lifetime.txt";
+	private String genericAPIPath = "res/android_api_generictype.txt";
+	private String varargsAPIPath = "res/android_api_varargs.txt";
+	private String androidAPIsDirPath = "res/android-apis"; 
 	
 	public static AndroidAPILifeModel getInstance()
 	{
@@ -55,6 +64,25 @@ public class AndroidAPILifeModel implements Serializable
 				instance = new AndroidAPILifeModel();
 				instance.serialize();
 			}
+			
+			Set<String> genericAPIs = CommonUtils.loadFile(instance.genericAPIPath);
+			for (String genericAPI : genericAPIs)
+			{
+				String compactSig = new MethodSignature(genericAPI).getCompactSignature();
+				//CommonUtils.put(instance.compactSig2Methods, compactSig, genericAPI);
+				CommonUtils.put(instance.compactSig2Methods_gt, compactSig, genericAPI);
+			}
+			
+			Set<String> varargsAPIs = CommonUtils.loadFile(instance.varargsAPIPath);
+			for (String varargsAPI : varargsAPIs)
+			{
+				String compactSig = new MethodSignature(varargsAPI).getCompactSignature();
+				//CommonUtils.put(instance.compactSig2Methods, compactSig, varargsAPI);
+				CommonUtils.put(instance.compactSig2Methods_varargs, compactSig, varargsAPI);
+			}
+			
+			CommonUtils.put(instance.compactSig2Methods, instance.compactSig2Methods_gt);
+			CommonUtils.put(instance.compactSig2Methods, instance.compactSig2Methods_varargs);
 		}
 
 		return instance;
@@ -62,18 +90,18 @@ public class AndroidAPILifeModel implements Serializable
 	
 	private AndroidAPILifeModel()
 	{
-		File androidAPIsDir = new File("res/android-apis");
+		File androidAPIsDir = new File(androidAPIsDirPath);
 		for (File file : androidAPIsDir.listFiles())
 		{
 			FrameworkBase fb = new FrameworkBase();
 			
 			fb.load(file.getAbsolutePath());
 			
-			put(class2SuperClasses, fb.class2SuperClasses);
-			put(class2Methods, fb.class2Methods);
+			CommonUtils.put(class2SuperClasses, fb.class2SuperClasses);
+			CommonUtils.put(class2Methods, fb.class2Methods);
 		}
 		
-		Set<String> lines = CommonUtils.loadFile("res/android_api_life.txt");
+		Set<String> lines = CommonUtils.loadFile(lifetimeAPIPath);
 		for (String line : lines)
 		{
 			APILife apiLife = new APILife(line);
@@ -81,16 +109,62 @@ public class AndroidAPILifeModel implements Serializable
 		}
 	}
 	
+	public boolean containsGenericType(String methodSig)
+	{
+		MethodSignature ms = new MethodSignature(methodSig);
+		String compactSig = ms.getCompactSignature();
+		
+		if (compactSig2Methods_gt.containsKey(compactSig))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean containsVarargs(String methodSig)
+	{
+		MethodSignature ms = new MethodSignature(methodSig);
+		String compactSig = ms.getCompactSignature();
+		
+		if (compactSig2Methods_varargs.containsKey(compactSig))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Extension
+	 * Generic Type
+	 * Varargs
+	 * 
+	 * @param methodSig
+	 * @return
+	 */
 	public boolean isAndroidAPI(String methodSig)
 	{
 		if (method2APILifes.containsKey(methodSig))
 		{
 			return true;
 		}
-		else
+		else if (compactSig2Methods_gt.containsKey(methodSig))
 		{
-			return false;
+			if (Config.DEBUG)
+				System.out.println("[DEBUG]" + methodSig + " is an Android API with generic type");
+			
+			return true;
 		}
+		else if (compactSig2Methods_varargs.containsKey(methodSig))
+		{
+			if (Config.DEBUG)
+				System.out.println("[DEBUG]" + methodSig + " is an Android API with varargs");
+			
+			return true;
+		}
+
+		return false;
 	}
 	
 	public void serialize()
@@ -103,39 +177,11 @@ public class AndroidAPILifeModel implements Serializable
 			oos.close();
 			fos.close();
 	        
-			System.out.printf("The API Life Model is Serialized into file res/apilife.model");
+			System.out.printf("The API Life Model is Serialized into file res/android_api_model.txt");
 	    }
 		catch(IOException ex) 
 		{
 			ex.printStackTrace();
-		}
-	}
-	
-	private void put(Map<String, Set<String>> map1, Map<String, Set<String>> map2)
-	{
-		for (Map.Entry<String, Set<String>> entry : map2.entrySet())
-		{
-			String cls = entry.getKey();
-			Set<String> set2 = entry.getValue();
-			
-			if (map1.containsKey(cls))
-			{
-				Set<String> set1 = map1.get(map1);
-				//Different API level may introduce different classes
-				if (set1 == null)
-				{
-					set1 = new HashSet<String>();
-				}
-				set1.addAll(set2);
-				
-				map1.put(cls, set1);
-			}
-			else
-			{
-				Set<String> set1 = new HashSet<String>();
-				set1.addAll(set2);
-				map1.put(cls, set1);
-			}
 		}
 	}
 	
@@ -149,51 +195,63 @@ public class AndroidAPILifeModel implements Serializable
 	{
 		APILife apiLife = new APILife(methodSignature, -1, -1);
 		
-		if (method2APILifes.containsKey(methodSignature))
-		{
-			APILife target = method2APILifes.get(methodSignature);
-			
-			apiLife.setMinAPILevel(target.getMinAPILevel());
-			apiLife.setMaxAPILevel(target.getMaxAPILevel());
-		}
-
 		MethodSignature sig = new MethodSignature(methodSignature);
-		String cls = sig.getCls();
-
-		if (class2SuperClasses.containsKey(cls))
+		
+		if (! method2APILifes.containsKey(methodSignature))
 		{
-			for (String superCls : class2SuperClasses.get(cls))
+			for (String methodSig : compactSig2Methods.get(sig.getCompactSignature()))
 			{
-				apiLife = refine(apiLife, cls, superCls);
+				MethodSignature ms = new MethodSignature(methodSig);
+				if (ms.containsGenericType())
+				{
+					System.out.println("INFO: GT Found, " + methodSig + "-->" + methodSignature);
+					refine(apiLife, methodSig);
+				}
+				else
+				{
+					System.out.println("INFO: Varargs Found, " + methodSig + "-->" + methodSignature);
+					refine(apiLife, methodSig);
+				}
+				// To be more precise: ms.containsGenericType() && ms.containsVarargs()
 			}
+		}
+		else
+		{
+			refine(apiLife, methodSignature);
 		}
 		
 		return apiLife;
 	}
 	
-	public APILife getLifetime(String methodSignature, Map<String, APISDKCheck> method2SDKChecks)
+	public APILife refine(APILife current, String methodSignature)
 	{
-		APILife apiLife = getLifetime(methodSignature);
-		
-		if (method2SDKChecks.containsKey(methodSignature))
+		if (method2APILifes.containsKey(methodSignature))
 		{
-			APISDKCheck sdkCheck = method2SDKChecks.get(methodSignature);
+			APILife target = method2APILifes.get(methodSignature);
 			
-			if (sdkCheck.noUpperBound)
+			if (current.getMinAPILevel() == -1 || current.getMinAPILevel() > target.getMinAPILevel())
 			{
-				System.out.println("EXTEND (UPPER_BOUND):" + apiLife.getMaxAPILevel() + ", (checked)" + sdkCheck.upperBoundValue);
-				apiLife.setMaxAPILevel(Config.LATEST_SDK_VERSION);
+				current.setMinAPILevel(target.getMinAPILevel());
 			}
-			
-			if (sdkCheck.noLowerBound)
+			if (current.getMinAPILevel() == -1 || current.getMaxAPILevel() < target.getMaxAPILevel())
 			{
-				System.out.println("EXTEND (LOWER_BOUND):" + apiLife.getMinAPILevel() + ", (checked)" + sdkCheck.lowerBoundValue);
-				apiLife.setMinAPILevel(1);
+				current.setMaxAPILevel(target.getMaxAPILevel());
 			}
 		}
 		
-		return apiLife;
+		MethodSignature sig = new MethodSignature(methodSignature);
+		String cls = sig.getCls();
+		if (class2SuperClasses.containsKey(cls))
+		{
+			for (String superCls : class2SuperClasses.get(cls))
+			{
+				current = refine(current, cls, superCls);
+			}
+		}
+		
+		return current;
 	}
+	
 	
 	public APILife refine(APILife current, String currentCls, String superCls)
 	{

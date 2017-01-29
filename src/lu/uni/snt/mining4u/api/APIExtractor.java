@@ -1,9 +1,12 @@
 package lu.uni.snt.mining4u.api;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import lu.uni.snt.mining4u.utils.CommonUtils;
 import soot.G;
 import soot.PackManager;
 import soot.Transform;
@@ -13,7 +16,10 @@ public class APIExtractor
 {
 	public Set<String> primaryAPIs = new HashSet<String>();
 	public Set<String> secondaryAPIs = new HashSet<String>();
-
+	
+	public Map<String, Set<String>> api2callers = new HashMap<String, Set<String>>();
+	public Set<String> usedAndroidAPIs = new HashSet<String>();
+	
 	public void transform(String apkOrDexPath, String androidJars, int apiLevel)
 	{
 		G.reset();
@@ -45,10 +51,14 @@ public class APIExtractor
 		if (apkOrDexPath.endsWith(".apk"))
 		{
 			primaryAPIs.addAll(transformer.accessedAndroidAPIs);
+			usedAndroidAPIs.addAll(primaryAPIs);
+			CommonUtils.put(api2callers, transformer.api2callers);
 		}
 		else
 		{
 			secondaryAPIs.addAll(transformer.accessedAndroidAPIs);
+			usedAndroidAPIs.addAll(secondaryAPIs);
+			CommonUtils.put(api2callers, transformer.api2callers);
 		}
 		
 		G.reset();

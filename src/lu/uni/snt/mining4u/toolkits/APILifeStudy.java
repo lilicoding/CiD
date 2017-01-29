@@ -20,7 +20,7 @@ public class APILifeStudy
 				continue;
 			}
 			
-			Set<String> methods = CommonUtils.loadFile("/Users/li.li/Project_Papers/Mining4U/res/android-apis-refinement/android-" + level + ".txt");
+			Set<String> methods = CommonUtils.loadFile("res/android-apis-refinement/android-" + level + ".txt");
 			
 			for (String method : methods)
 			{
@@ -64,7 +64,7 @@ public class APILifeStudy
 			output.append(apiLifeMap.get(key) + "\n");
 		}
 		
-		CommonUtils.writeResultToFile("res/android_api_life.txt", output.toString());
+		CommonUtils.writeResultToFile("res/android_api_lifetime.txt", output.toString());
 	}
 
 	static class APILife

@@ -43,7 +43,7 @@ public class CommonUtils
 	public static void writeResultToFile(String path, String content)
 	{
 		try {
-		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(path, true)));
+		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(path, false)));
 		    out.print(content);
 		    out.close();
 		} catch (IOException e) {
@@ -173,5 +173,53 @@ public class CommonUtils
 		double rate = (double) identical / (double) total;
 		
 		return rate;
+	}
+	
+	public static void put(Map<String, Set<String>> map1, String key, String value)
+	{
+		if (map1.containsKey(key))
+		{
+			Set<String> values = map1.get(key);
+			if (values == null)
+			{
+				System.out.println("XX");
+			}
+			values.add(value);
+			map1.put(key, values);
+		}
+		else
+		{
+			Set<String> values = new HashSet<String>();
+			values.add(value);
+			map1.put(key, values);
+		}
+	}
+	
+	public static void put(Map<String, Set<String>> dest, Map<String, Set<String>> src)
+	{
+		for (Map.Entry<String, Set<String>> entry : src.entrySet())
+		{
+			String cls = entry.getKey();
+			Set<String> set2 = entry.getValue();
+			
+			if (dest.containsKey(cls))
+			{
+				Set<String> set1 = dest.get(cls);
+				//Different API level may introduce different classes
+				if (set1 == null)
+				{
+					set1 = new HashSet<String>();
+				}
+				set1.addAll(set2);
+				
+				dest.put(cls, set1);
+			}
+			else
+			{
+				Set<String> set1 = new HashSet<String>();
+				set1.addAll(set2);
+				dest.put(cls, set1);
+			}
+		}
 	}
 }

@@ -12,6 +12,8 @@ public class MethodSignature
 	private int parameterNumber;
 	private String[] parameterTypes;
 	
+	private boolean containsGenericType = false;
+	
 	public MethodSignature(String signature)
 	{
 		this.signature = signature;
@@ -26,22 +28,21 @@ public class MethodSignature
 	
 	public void parse(String signature)
 	{
-		int pos = signature.indexOf(':');
-		cls = signature.substring(1, pos);
+		int posColon = signature.indexOf(':');
+		cls = signature.substring(1, posColon);
 
 		
 		ClassSignature cs = new ClassSignature(cls);
 		pkg = cs.getPackageName();
 		
-		String[] strs = signature.split(" ");
-		pos = strs[2].indexOf('(');
-		methodName = strs[2].substring(0, pos);
+		int posStartBracket = signature.indexOf('(');
+		int posSpaceBeforeMethodName = signature.lastIndexOf(' ', posStartBracket);
 		
-		returnType = strs[1];
-		
-		pos = signature.indexOf('(');
-		int endPos = signature.lastIndexOf(')');
-		String parameters = signature.substring(pos+1, endPos);
+		returnType = signature.substring(posColon+2, posSpaceBeforeMethodName);
+		methodName = signature.substring(posSpaceBeforeMethodName+1, posStartBracket);
+
+		int posEndBracket = signature.lastIndexOf(')');
+		String parameters = signature.substring(posStartBracket+1, posEndBracket);
 		
 		if (parameters.isEmpty())
 		{
@@ -70,19 +71,113 @@ public class MethodSignature
 		}
 	}
 
+	/**
+	 * 
+	 * Remove Generic programming introduced items, such as <java.lang.String>, <T>, <?>, <? extends Object>, ... 
+	 * 
+	 * @param methodSig
+	 * @return
+	 */
+	public String getSignatureWithoutGPItems()
+	{
+		returnType = returnType.replaceAll("<.+>", "");
+		if (returnType.length() == 1)
+		{
+			containsGenericType = true;
+		}
+		
+		String paramStr = "";
+		if (null != parameterTypes)
+		{
+			for (int i = 0; i < parameterTypes.length; i++)
+			{
+				if (parameterTypes[i].length() == 1)
+				{
+					containsGenericType = true;
+				}
+				
+				if (0 == i)
+					paramStr = paramStr + parameterTypes[i];
+				else
+					paramStr = paramStr + "," + parameterTypes[i];
+			}
+		}
+		
+		paramStr = paramStr.replaceAll("<.+>", "");
+		
+		String sig = "<" + cls + ": " + returnType + " " + methodName + "(" + paramStr + ")>";
+		
+		if (containsGenericType)
+		{
+			System.out.println(sig);
+		}
+		
+		return sig;
+	}
+	
+	
+	
 	public String getCompactSignature()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(cls);
 		sb.append("." + methodName);
-		for (String paramType : parameterTypes)
+		
+		/*if (null != parameterTypes)
 		{
-			sb.append("_" + paramType);
-		}
+			sb.append(parameterTypes.length);
+		}*/
 		
 		return sb.toString();
 	}
 	
+	public String getCompactSignatureWithParams()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(cls);
+		sb.append("." + methodName);
+		
+		for (String param : parameterTypes)
+		{
+			sb.append("." + param);
+		}
+		
+		System.out.println(sb.toString());
+		
+		return sb.toString();
+	}
+	
+	public boolean containsVarargs()
+	{
+		return this.signature.contains("...");
+	}
+	
+	public boolean containsGenericType() 
+	{
+		boolean containsGenericType = false;
+		
+		returnType = returnType.replaceAll("<.+>", "").replaceAll("\\.\\.\\.", "");
+		if (returnType.length() == 1)
+		{
+			containsGenericType = true;
+		}
+		
+		if (null != parameterTypes)
+		{
+			for (int i = 0; i < parameterTypes.length; i++)
+			{
+				parameterTypes[i] = parameterTypes[i].replaceAll("<.+>", "").replaceAll("\\.\\.\\.", "");
+				
+				if (parameterTypes[i].length() == 1)
+				{
+					containsGenericType = true;
+				}
+			}
+		}
+		
+		return containsGenericType;
+	}
+
 	public String getSignature() {
 		return signature;
 	}

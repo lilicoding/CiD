@@ -33,7 +33,6 @@ public class APIExtractor
 			"-allow-phantom-refs",
 			"-w",
 			"-p", "cg", "enabled:false",
-			"-p", "wjtp.rdc", "enabled:true",
 			"-src-prec", "apk"
         };
 			
@@ -43,9 +42,9 @@ public class APIExtractor
 		else
 			Options.v().set_android_jars(androidJars);
 		
-		APITransformer transformer = new APITransformer();
+		Mining4UTransformer transformer = new Mining4UTransformer();
 		
-		PackManager.v().getPack("jtp").add(new Transform("jtp.APITransformer", transformer));
+		PackManager.v().getPack("jtp").add(new Transform("jtp.Mining4UTransformer", transformer));
 		soot.Main.main(args);
 		
 		if (apkOrDexPath.endsWith(".apk"))

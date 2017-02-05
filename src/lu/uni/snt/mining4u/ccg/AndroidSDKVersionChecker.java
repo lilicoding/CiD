@@ -2,48 +2,26 @@ package lu.uni.snt.mining4u.ccg;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import lu.uni.snt.mining4u.Config;
 import lu.uni.snt.mining4u.utils.SootUtils;
 import soot.Body;
-import soot.BodyTransformer;
-import soot.G;
-import soot.PackManager;
 import soot.SootClass;
 import soot.SootMethod;
-import soot.Transform;
 import soot.Unit;
 import soot.Value;
 import soot.ValueBox;
 import soot.jimple.AssignStmt;
 import soot.jimple.IfStmt;
 import soot.jimple.InterfaceInvokeExpr;
+import soot.jimple.ReturnStmt;
 import soot.jimple.Stmt;
-import soot.options.Options;
 import soot.toolkits.graph.ExceptionalUnitGraph;
 
-public class AndroidSDKVersionChecker extends BodyTransformer 
+public class AndroidSDKVersionChecker// extends BodyTransformer 
 {
-	public static void main(String[] args) 
-	{
-		/*
-		new AndroidSDKVersionChecker().scan("/Volumes/joey/workspace/mudflow_benign_apps/0088969C4F4B03A537A257FD43B1C8552372724AD410B6A477AC48CB881AB51E.apk", 
-				"/Users/li.li/Project/github/android-platforms");
-		
-		
-		for (String methodSig : ConditionalCallGraph.srcMethod2edges.keySet())
-		{
-			for (Edge e : ConditionalCallGraph.srcMethod2edges.get(methodSig))
-			{
-				if (! e.conditions.contains("[]"))
-					System.out.println(e.conditions + ":" +  e.srcSig + "-->" + e.tgtSig);
-			}
-		}
-		*/
-	}
-	
-	
+	/*
 	public static void scan(String apkPath, String androidJars)
 	{
 		G.reset();
@@ -69,20 +47,19 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 		G.reset();
 		
 		ConditionalCallGraph.expandConstructors();
-	}
+	}*/
 	
-	@Override
-	protected void internalTransform(Body b, String phaseName, Map<String, String> options) 
+	//@Override
+	//protected void internalTransform(Body b, String phaseName, Map<String, String> options)
+	public static void scan(Body b)
 	{
-		//System.out.print(b);
-		
-		if (b.getMethod().getSignature().equals("<android.graphics.drawable.AnimatedVectorDrawable: void start()>"))
-		{
-			System.out.println("what the fuck" + b);
-		}
-		
 		if (! b.getMethod().getDeclaringClass().getName().startsWith("android.support"))
 		{
+			if (b.toString().contains(Config.FIELD_VERSION_SDK_INT))
+			{
+				Config.containsSDKVersionChecker = true;
+			}
+			
 			ExceptionalUnitGraph graph = new ExceptionalUnitGraph(b);
 
 			for (Unit unit : graph.getHeads())
@@ -92,7 +69,7 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 		}
 	}
 	
-	void traverse(Body b, ExceptionalUnitGraph graph, Unit unit, Set<Value> sdkIntValues, Set<String> conditions, Set<Unit> visitedUnits)
+	static void traverse(Body b, ExceptionalUnitGraph graph, Unit unit, Set<Value> sdkIntValues, Set<String> conditions, Set<Unit> visitedUnits)
 	{
 		if (visitedUnits.contains(unit))
 		{
@@ -114,7 +91,7 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 				AssignStmt assignStmt = (AssignStmt) stmt;
 				Value leftOp = assignStmt.getLeftOp();
 				
-				if (stmt.toString().contains("<android.os.Build$VERSION: int SDK_INT>"))
+				if (stmt.toString().contains(Config.FIELD_VERSION_SDK_INT))
 				{
 					sdkIntValues.add(leftOp);
 				}
@@ -130,10 +107,8 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 			
 			if (stmt.containsInvokeExpr())
 			{
-				Edge edge = new Edge();
-				edge.srcSig = b.getMethod().getSignature();
-				edge.tgtSig = stmt.getInvokeExpr().getMethod().getSignature();
-				edge.conditions = conditions.toString();
+				Edge edge = ConditionalCallGraph.getEdge(b.getMethod().getSignature(), stmt.getInvokeExpr().getMethod().getSignature());
+				edge.conditions.add(conditions.toString());
 				
 				ConditionalCallGraph.addEdge(edge);
 				
@@ -152,11 +127,8 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 					
 					for (SootClass subClass : subClasses)
 					{
-						Edge e = new Edge();
-						e.srcSig = edge.srcSig;
-						e.conditions = edge.conditions;
-						
-						e.tgtSig = edge.tgtSig.replace(sootClass.getName() + ":", subClass.getName() + ":");
+						Edge e = ConditionalCallGraph.getEdge(edge.srcSig, edge.tgtSig.replace(sootClass.getName() + ":", subClass.getName() + ":"));
+						e.conditions.addAll(edge.conditions);
 						
 						ConditionalCallGraph.addEdge(e);
 					}
@@ -182,6 +154,11 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 			{
 				stmt = (Stmt) succUnits.get(0);
 				
+				if (stmt instanceof ReturnStmt)
+				{
+					return;
+				}
+				
 				if (visitedUnits.contains(stmt))
 				{
 					return;
@@ -191,6 +168,11 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 					visitedUnits.add(stmt);
 				}
 			}
+			else if (succUnits.size() == 0)
+			{
+				//It's a return statement
+				return;
+			}
 			else
 			{
 				break;
@@ -199,20 +181,29 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 		
 		if (sdkChecker)
 		{
-			IfStmt ifStmt = (IfStmt) stmt;
-			Stmt targetStmt = ifStmt.getTarget();
-			
-			Set<String> positiveConditions = cloneSet(conditions);
-			positiveConditions.add(ifStmt.getCondition().toString());
-			traverse(b, graph, targetStmt, sdkIntValues, positiveConditions, visitedUnits);
-			
-			succUnits.remove(targetStmt);
-			Set<String> negativeConditions = cloneSet(conditions);
-			negativeConditions.add("-" + ifStmt.getCondition().toString());
-			for (Unit u : succUnits)
+			if (stmt instanceof IfStmt)
 			{
-				traverse(b, graph, u, sdkIntValues, negativeConditions, visitedUnits);
+				IfStmt ifStmt = (IfStmt) stmt;
+				Stmt targetStmt = ifStmt.getTarget();
+				
+				Set<String> positiveConditions = cloneSet(conditions);
+				positiveConditions.add(ifStmt.getCondition().toString());
+				traverse(b, graph, targetStmt, sdkIntValues, positiveConditions, visitedUnits);
+				
+				succUnits.remove(targetStmt);
+				Set<String> negativeConditions = cloneSet(conditions);
+				negativeConditions.add("-" + ifStmt.getCondition().toString());
+				for (Unit u : succUnits)
+				{
+					traverse(b, graph, u, sdkIntValues, negativeConditions, visitedUnits);
+				}
 			}
+			else
+			{
+				// For example, return statement
+				return;
+			}
+			
 		}
 		else
 		{
@@ -223,7 +214,7 @@ public class AndroidSDKVersionChecker extends BodyTransformer
 		}
 	}
 	
-	public Set<String> cloneSet(Set<String> src)
+	public static Set<String> cloneSet(Set<String> src)
 	{
 		Set<String> tgt = new HashSet<String>();
 		for (String str : src)

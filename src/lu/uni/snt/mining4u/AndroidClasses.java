@@ -1,28 +1,20 @@
 package lu.uni.snt.mining4u;
-
-import java.util.HashSet;
 import java.util.Set;
 
 import lu.uni.snt.mining4u.utils.CommonUtils;
 
 public class AndroidClasses 
 {
-	private static Set<String> androidClasses = null;
+	static Set<String> androidClasses = null;
 	
-	public static boolean isAndroidClass(String clsName)
+	public static boolean isAndroidClass(String cls)
 	{
 		if (null == androidClasses)
 		{
-			androidClasses = new HashSet<String>();
-			Set<String> lines = CommonUtils.loadFile("res/android_api_life.txt");
-			for (String line : lines)
-			{
-				String str = line.substring(1, line.indexOf(':'));
-				androidClasses.add(str);
-			}
+			androidClasses = CommonUtils.loadFile("res/android-classes.txt");
 		}
 		
-		if (androidClasses.contains(clsName))
+		if (androidClasses.contains(cls))
 		{
 			return true;
 		}

@@ -137,6 +137,18 @@ public class CommonUtils
 		return lines;
 	}
 	
+	public static Set<String> cloneSet(Set<String> src)
+	{
+		Set<String> dest = new HashSet<String>();
+		
+		for (String str : src)
+		{
+			dest.add(str);
+		}
+		
+		return dest;
+	}
+	
 	public static TreeMap<String,Integer> sort(Map<String, Integer> map)
 	{
 		ValueComparator bvc =  new ValueComparator(map);
@@ -175,21 +187,17 @@ public class CommonUtils
 		return rate;
 	}
 	
-	public static void put(Map<String, Set<String>> map1, String key, String value)
+	public static <T> void put(Map<String, Set<T>> map1, String key, T value)
 	{
 		if (map1.containsKey(key))
 		{
-			Set<String> values = map1.get(key);
-			if (values == null)
-			{
-				System.out.println("XX");
-			}
+			Set<T> values = map1.get(key);
 			values.add(value);
 			map1.put(key, values);
 		}
 		else
 		{
-			Set<String> values = new HashSet<String>();
+			Set<T> values = new HashSet<T>();
 			values.add(value);
 			map1.put(key, values);
 		}
@@ -205,13 +213,7 @@ public class CommonUtils
 			if (dest.containsKey(cls))
 			{
 				Set<String> set1 = dest.get(cls);
-				//Different API level may introduce different classes
-				if (set1 == null)
-				{
-					set1 = new HashSet<String>();
-				}
 				set1.addAll(set2);
-				
 				dest.put(cls, set1);
 			}
 			else

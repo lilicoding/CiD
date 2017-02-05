@@ -69,7 +69,7 @@ public class AndroidAPILifeModel implements Serializable
 			for (String genericAPI : genericAPIs)
 			{
 				String compactSig = new MethodSignature(genericAPI).getCompactSignature();
-				//CommonUtils.put(instance.compactSig2Methods, compactSig, genericAPI);
+				CommonUtils.put(instance.compactSig2Methods, compactSig, genericAPI);
 				CommonUtils.put(instance.compactSig2Methods_gt, compactSig, genericAPI);
 			}
 			
@@ -77,12 +77,12 @@ public class AndroidAPILifeModel implements Serializable
 			for (String varargsAPI : varargsAPIs)
 			{
 				String compactSig = new MethodSignature(varargsAPI).getCompactSignature();
-				//CommonUtils.put(instance.compactSig2Methods, compactSig, varargsAPI);
+				CommonUtils.put(instance.compactSig2Methods, compactSig, varargsAPI);
 				CommonUtils.put(instance.compactSig2Methods_varargs, compactSig, varargsAPI);
 			}
 			
-			CommonUtils.put(instance.compactSig2Methods, instance.compactSig2Methods_gt);
-			CommonUtils.put(instance.compactSig2Methods, instance.compactSig2Methods_varargs);
+			//CommonUtils.put(instance.compactSig2Methods, instance.compactSig2Methods_gt);
+			//CommonUtils.put(instance.compactSig2Methods, instance.compactSig2Methods_varargs);
 		}
 
 		return instance;
@@ -152,14 +152,14 @@ public class AndroidAPILifeModel implements Serializable
 		else if (compactSig2Methods_gt.containsKey(methodSig))
 		{
 			if (Config.DEBUG)
-				System.out.println("[DEBUG]" + methodSig + " is an Android API with generic type");
+				System.out.println("[DEBUG] Generic Programming:" + methodSig + " is an Android API with generic type");
 			
 			return true;
 		}
 		else if (compactSig2Methods_varargs.containsKey(methodSig))
 		{
 			if (Config.DEBUG)
-				System.out.println("[DEBUG]" + methodSig + " is an Android API with varargs");
+				System.out.println("[DEBUG] Varargs:" + methodSig + " is an Android API with varargs");
 			
 			return true;
 		}
@@ -259,6 +259,9 @@ public class AndroidAPILifeModel implements Serializable
 		
 		if (method2APILifes.containsKey(newMethodSig))
 		{
+			if (Config.DEBUG)
+				System.out.println("[DEBUG] SuperClass:" + current.getSignature() + "-->" + newMethodSig);
+			
 			APILife target = method2APILifes.get(newMethodSig);
 			
 			if (current.getMinAPILevel() == -1 || current.getMinAPILevel() > target.getMinAPILevel())

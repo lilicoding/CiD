@@ -11,6 +11,7 @@ import lu.uni.snt.mining4u.api.APIExtractor;
 import lu.uni.snt.mining4u.api.APILife;
 import lu.uni.snt.mining4u.ccg.ConditionalCallGraph;
 import lu.uni.snt.mining4u.dcl.DexHunter;
+import lu.uni.snt.mining4u.utils.MethodSignature;
 
 public class Mining4UClient 
 {
@@ -121,6 +122,18 @@ public class Mining4UClient
 		{
 			System.out.println("==>Protected_Forward" + lifetime);
 			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
+			for (String methodSig : extractor.api2callers.get(lifetime.getSignature()))
+			{
+				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(methodSig).getCls());
+				if (isLibraryMethod)
+				{
+					System.out.println("==>Library:True-->" + lifetime + "-->" + methodSig);
+				}
+				else
+				{
+					System.out.println("==>Library:False-->" + lifetime + "-->" + methodSig);
+				}
+			}
 			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
 		}
 		
@@ -128,6 +141,18 @@ public class Mining4UClient
 		{
 			System.out.println("==>Problematic_Forward" + lifetime);
 			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
+			for (String methodSig : extractor.api2callers.get(lifetime.getSignature()))
+			{
+				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(methodSig).getCls());
+				if (isLibraryMethod)
+				{
+					System.out.println("==>Library:True-->" + lifetime + "-->" + methodSig);
+				}
+				else
+				{
+					System.out.println("==>Library:False-->" + lifetime + "-->" + methodSig);
+				}
+			}
 			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
 		}
 		
@@ -136,6 +161,18 @@ public class Mining4UClient
 		{
 			System.out.println("==>Protected_Backward" + lifetime);
 			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
+			for (String methodSig : extractor.api2callers.get(lifetime.getSignature()))
+			{
+				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(methodSig).getCls());
+				if (isLibraryMethod)
+				{
+					System.out.println("==>Library:True-->" + lifetime + "-->" + methodSig);
+				}
+				else
+				{
+					System.out.println("==>Library:False-->" + lifetime + "-->" + methodSig);
+				}
+			}
 			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
 		}
 		
@@ -143,6 +180,18 @@ public class Mining4UClient
 		{
 			System.out.println("==>Problematic_Backward" + lifetime);
 			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
+			for (String methodSig : extractor.api2callers.get(lifetime.getSignature()))
+			{
+				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(methodSig).getCls());
+				if (isLibraryMethod)
+				{
+					System.out.println("==>Library:True-->" + lifetime + "-->" + methodSig);
+				}
+				else
+				{
+					System.out.println("==>Library:False-->" + lifetime + "-->" + methodSig);
+				}
+			}
 			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
 		}
 	}

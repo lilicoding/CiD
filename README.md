@@ -21,6 +21,8 @@ CiD takes as input two parameters which are summarized as follows:
 Interested users can refer to the [android-platofrms](https://github.com/lilicoding/android-platforms) project for possible samples.
 
 Users can launch CiD through the following script:
+
 ```
-java -Xmx8G -jar CiD.jar $apkPath $androidJars
+git clone https://github.com/lilicoding/android-platforms
+java -Xmx8G -jar CiD.jar $apkPath android-platforms
 ```

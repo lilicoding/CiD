@@ -55,8 +55,6 @@ Found 1 Android APIs (for backward compatibility) that are accessed problematica
 
 [<lu.uni.snt.apicompatibility_basic.MainActivity: void checkStorageEncryption()>]
 
---Library:False--><android.os.storage.StorageManager: boolean isEncrypted(java.io.File)>:[24,25]--><lu.uni.snt.apicompatibility_basic.MainActivity: void checkStorageEncryption()>
-
 [<lu.uni.snt.apicompatibility_basic.MainActivity: void checkStorageEncryption()>
 , |--> <lu.uni.snt.apicompatibility_basic.MainActivity: void onCreate(android.os.Bundle)> [[]]
 ]

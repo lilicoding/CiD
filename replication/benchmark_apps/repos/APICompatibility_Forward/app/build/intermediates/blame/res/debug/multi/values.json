@@ -1,0 +1,125 @@
+[
+    {
+        "outputFile": "/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 57,
+                    "endOffset": 108
+                },
+                "from": {
+                    "file": "/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/src/main/res/values/dimens.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 89,
+                        "endColumn": 57,
+                        "endOffset": 142
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 113,
+                    "endColumn": 55,
+                    "endOffset": 164
+                },
+                "from": {
+                    "file": "/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/src/main/res/values/dimens.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 147,
+                        "endColumn": 55,
+                        "endOffset": 198
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 169,
+                    "endColumn": 61,
+                    "endOffset": 226
+                },
+                "from": {
+                    "file": "/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/src/main/res/values/strings.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 17,
+                        "endColumn": 61,
+                        "endOffset": 74
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 231,
+                    "endColumn": 52,
+                    "endOffset": 279
+                },
+                "from": {
+                    "file": "/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/src/main/res/values/strings.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 84,
+                        "endColumn": 52,
+                        "endOffset": 132
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 284,
+                    "endLine": 12,
+                    "endColumn": 12,
+                    "endOffset": 570
+                },
+                "from": {
+                    "file": "/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/src/main/res/values/styles.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 186,
+                        "endLine": 12,
+                        "endColumn": 12,
+                        "endOffset": 472
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 13,
+                    "startColumn": 4,
+                    "startOffset": 575,
+                    "endLine": 15,
+                    "endColumn": 12,
+                    "endOffset": 730
+                },
+                "from": {
+                    "file": "/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/src/main/res/values/styles.xml",
+                    "position": {
+                        "startLine": 15,
+                        "startColumn": 4,
+                        "startOffset": 510,
+                        "endLine": 17,
+                        "endColumn": 12,
+                        "endOffset": 665
+                    }
+                }
+            }
+        ]
+    }
+]

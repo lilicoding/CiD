@@ -1,0 +1,7 @@
+<resources>
+
+    <string name="app_name">APICompatibility_Forward</string>
+    
+    <string name="hello_world">Hello world!</string>
+
+</resources>

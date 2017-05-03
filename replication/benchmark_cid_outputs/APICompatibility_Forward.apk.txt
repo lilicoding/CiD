@@ -1,0 +1,39 @@
+Soot started on Tue Feb 14 11:57:03 CET 2017
+Using '/Users/li.li/Project/github/android-platforms/android-19/android.jar' as android.jar
+Warning: java.lang.invoke.LambdaMetafactory is a phantom class!
+Warning: java.lang.ref.Finalizer is a phantom class!
+[DEBUG] No body for method <lu.uni.snt.apicompatibility_forward.MainActivity: android.content.res.Resources getResources()>
+[DEBUG] No body for method <lu.uni.snt.apicompatibility_forward.MainActivity: void setContentView(int)>
+Transforming lu.uni.snt.apicompatibility_forward.R$attr... 
+Transforming lu.uni.snt.apicompatibility_forward.R$id... 
+Transforming lu.uni.snt.apicompatibility_forward.R... 
+Transforming lu.uni.snt.apicompatibility_forward.MainActivity... 
+Transforming lu.uni.snt.apicompatibility_forward.R$string... 
+Transforming lu.uni.snt.apicompatibility_forward.R$dimen... 
+Transforming lu.uni.snt.apicompatibility_forward.R$layout... 
+Transforming lu.uni.snt.apicompatibility_forward.BuildConfig... 
+Transforming lu.uni.snt.apicompatibility_forward.R$drawable... 
+Transforming lu.uni.snt.apicompatibility_forward.R$style... 
+Soot finished on Tue Feb 14 11:57:05 CET 2017
+Soot has run for 0 min. 1 sec.
+Found 0 DEX files. Now visiting them one by one.
+--------------------------------------------------------------------------------------------------------
+Declared Min Sdk version is: 10
+Declared Target Sdk version is: 19
+Declared Max Sdk version is: -1
+Collected 12 Android APIs in the primary DEX file
+Collected 0 Android APIs in the secondary DEX files
+[DEBUG] SuperClass:<android.content.ContextWrapper: android.content.res.Resources getResources()>--><android.content.Context: android.content.res.Resources getResources()>
+[DEBUG] SuperClass:<android.app.Activity: void <init>()>--><android.view.ContextThemeWrapper: void <init>()>
+[DEBUG] SuperClass:<android.app.Activity: void <init>()>--><android.content.Context: void <init>()>
+SDK Check:false
+Found 0 Android APIs (for forward compatibility) that are accessed with protection (SDK Check)
+Found 1 Android APIs (for forward compatibility) that are accessed problematically 
+Found 0 Android APIs (for backward compatibility) that are accessed with protection (SDK Check)
+Found 0 Android APIs (for backward compatibility) that are accessed problematically 
+==>Problematic_Forward<android.content.res.AssetManager.AssetInputStream: int getAssetInt()>:[1,19]
+[<lu.uni.snt.apicompatibility_forward.MainActivity: void checkGetAssetInt()>]
+==>Library:False--><android.content.res.AssetManager.AssetInputStream: int getAssetInt()>:[1,19]--><lu.uni.snt.apicompatibility_forward.MainActivity: void checkGetAssetInt()>
+[<lu.uni.snt.apicompatibility_forward.MainActivity: void checkGetAssetInt()>
+, |--> <lu.uni.snt.apicompatibility_forward.MainActivity: void onCreate(android.os.Bundle)> [[]]
+]

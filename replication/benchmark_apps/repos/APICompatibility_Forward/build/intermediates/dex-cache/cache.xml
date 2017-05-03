@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3f4353d6ed52a33b3ea20f64548513bcd53865f3">
+        <dex dex="/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_9cbe3209f07b9594bb16e81da1f40762adae07d7/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="d308c4815101cfcc29962b0315ae56ef73368bfe">
+        <dex dex="/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_4d5cbda78d36ce615a4ed94a409174c89ccd9e15/classes.dex" />
+    </item>
+
+</items>

@@ -1,0 +1,27 @@
+#Internal package file, do not edit.
+#Sun Feb 12 09:36:20 CET 2017
+2.base=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_
+5.file=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_/res/drawable-mdpi-v4/ic_launcher.png
+5.set=ANDROID_RESOURCE
+3.base=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_
+6.file=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_/res/drawable-xxhdpi-v4/ic_launcher.png
+2.set=ANDROID_RESOURCE
+4.base=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_
+7.file=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_/res/layout/activity_main.xml
+7.set=ANDROID_RESOURCE
+count=8
+0.file=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/transforms/dex/release/folders/1000/1f/main/classes.dex
+5.base=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_
+4.set=ANDROID_RESOURCE
+6.base=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_
+1.file=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_/resources.arsc
+1.set=ANDROID_RESOURCE
+7.base=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_
+2.file=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_/res/drawable-hdpi-v4/ic_launcher.png
+6.set=ANDROID_RESOURCE
+0.base=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/transforms/dex/release/folders/1000/1f/main
+3.file=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_/AndroidManifest.xml
+3.set=ANDROID_RESOURCE
+1.base=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_
+4.file=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/res/resources-release.ap_/res/drawable-xhdpi-v4/ic_launcher.png
+0.set=DEX

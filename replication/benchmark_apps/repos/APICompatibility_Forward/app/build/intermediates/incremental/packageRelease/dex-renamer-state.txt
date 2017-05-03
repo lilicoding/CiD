@@ -1,0 +1,4 @@
+#Sun Feb 12 09:36:20 CET 2017
+base.0=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/transforms/dex/release/folders/1000/1f/main
+renamed.0=classes.dex
+file.0=/Users/li.li/Project/compatibility_benchmarks/repos/APICompatibility_Forward/app/build/intermediates/transforms/dex/release/folders/1000/1f/main/classes.dex

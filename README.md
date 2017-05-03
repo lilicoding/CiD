@@ -20,6 +20,7 @@ Android APIs in an app. This module considers not only core app code, but also a
 Finally, the third module, ACA, evaluates the output of ALM and AUE altogether to flag any potential 
 API compatibility-related issue.
 We provide further details on the working process of these modules in the remainder of this section.
+
 [[cid_overview.pdf]]
 
 # Quick Start

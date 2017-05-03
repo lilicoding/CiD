@@ -13,7 +13,7 @@ import lu.uni.snt.mining4u.ccg.ConditionalCallGraph;
 import lu.uni.snt.mining4u.dcl.DexHunter;
 import lu.uni.snt.mining4u.utils.MethodSignature;
 
-public class Mining4UClient 
+public class CiD
 {
 	public static void main(String[] args) 
 	{

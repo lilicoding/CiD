@@ -21,7 +21,7 @@ Finally, the third module, ACA, evaluates the output of ALM and AUE altogether t
 API compatibility-related issue.
 We provide further details on the working process of these modules in the remainder of this section.
 
-![Approach Overview](cid_overview.pdf)
+![Approach Overview](cid_overview.png)
 
 # Quick Start
 

@@ -1,0 +1,9 @@
+com.code61.deadpixel_2.apk.txt:Declared Min Sdk version is: -1
+com.java.SmokeReducer_1.apk.txt:Declared Min Sdk version is: -1
+com.nephoapp.anarxiv_1.apk.txt:Declared Min Sdk version is: -1
+net.healeys.lexic_41.apk.txt:Declared Min Sdk version is: -1
+org.beide.bomber_1.apk.txt:Declared Min Sdk version is: -1
+org.vi_server.red_screen_1.apk.txt:Declared Min Sdk version is: -1
+org.vi_server.red_screen_2.apk.txt:Declared Min Sdk version is: -1
+remuco.client.android_1.apk.txt:Declared Min Sdk version is: -1
+SpeedoMeterApp.main_1.apk.txt:Declared Min Sdk version is: -1

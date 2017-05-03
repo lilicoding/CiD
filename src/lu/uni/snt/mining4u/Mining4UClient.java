@@ -35,7 +35,7 @@ public class Mining4UClient
 		}
 		finally
 		{
-			clean(apkName);
+			clean(Config.apkName);
 		}
 	}
 
@@ -51,7 +51,7 @@ public class Mining4UClient
 		//(3) Extracting the leveraged Android APIs (primary and all)
 		APIExtractor extractor = new APIExtractor();
 		extractor.transform(apkPath, androidJars, apiLevel);
-		System.out.println("Found " + additionalDexes.size() + " DEX files. Now visiting them one by one.");
+		System.out.println("Found " + additionalDexes.size() + " additional DEX files. Now visiting them one by one.");
 		for (String dex : additionalDexes)
 		{
 			extractor.transform(dex, androidJars, apiLevel);
@@ -85,11 +85,22 @@ public class Mining4UClient
 		for (String method : extractor.usedAndroidAPIs)
 		{
 			APILife lifetime = AndroidAPILifeModel.getInstance().getLifetime(method);
-
+			
+			if (lifetime.getMinAPILevel() == -1 || lifetime.getMaxAPILevel() == -1)
+			{
+				if (Config.DEBUG)
+				{
+					System.out.println("[DEBUG] Wrong Min/Max API Level for " + lifetime.getSignature());
+				}
+				
+				continue;
+			}
+			
 			if (lifetime.getMaxAPILevel() < maxAPILevel)
 			{
 				if (ConditionalCallGraph.obtainConditions(method).isEmpty())
 				{
+					
 					problematicAPIs_forward.add(lifetime);
 				}
 				else
@@ -98,7 +109,7 @@ public class Mining4UClient
 				}
 			}
 			
-			if (lifetime.getMinAPILevel() > minAPILevel)
+			if (lifetime.getMinAPILevel() > minAPILevel && lifetime.getMinAPILevel() > 1)
 			{
 				if (ConditionalCallGraph.obtainConditions(method).isEmpty())
 				{
@@ -117,82 +128,81 @@ public class Mining4UClient
 		System.out.println("Found " + protectedAPIs_backward.size() + " Android APIs (for backward compatibility) that are accessed with protection (SDK Check)");
 		System.out.println("Found " + problematicAPIs_backward.size() + " Android APIs (for backward compatibility) that are accessed problematically ");
 		
-		
 		for (APILife lifetime : protectedAPIs_forward)
 		{
-			System.out.println("==>Protected_Forward" + lifetime);
+			System.out.println("\n==>Protected_Forward" + lifetime);
 			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
 			for (String methodSig : extractor.api2callers.get(lifetime.getSignature()))
 			{
 				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(methodSig).getCls());
 				if (isLibraryMethod)
 				{
-					System.out.println("==>Library:True-->" + lifetime + "-->" + methodSig);
+					System.out.println("--Library:True-->" + lifetime + "-->" + methodSig);
 				}
 				else
 				{
-					System.out.println("==>Library:False-->" + lifetime + "-->" + methodSig);
+					System.out.println("--Library:False-->" + lifetime + "-->" + methodSig);
+					System.out.println(ConditionalCallGraph.obtainCallStack(methodSig));
 				}
 			}
-			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
 		}
 		
 		for (APILife lifetime : problematicAPIs_forward)
 		{
-			System.out.println("==>Problematic_Forward" + lifetime);
+			System.out.println("\n==>Problematic_Forward" + lifetime);
 			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
 			for (String methodSig : extractor.api2callers.get(lifetime.getSignature()))
 			{
 				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(methodSig).getCls());
 				if (isLibraryMethod)
 				{
-					System.out.println("==>Library:True-->" + lifetime + "-->" + methodSig);
+					System.out.println("--Library:True-->" + lifetime + "-->" + methodSig);
 				}
 				else
 				{
-					System.out.println("==>Library:False-->" + lifetime + "-->" + methodSig);
+					System.out.println("--Library:False-->" + lifetime + "-->" + methodSig);
+					System.out.println(ConditionalCallGraph.obtainCallStack(methodSig));
 				}
 			}
-			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
 		}
 		
 		
 		for (APILife lifetime : protectedAPIs_backward)
 		{
-			System.out.println("==>Protected_Backward" + lifetime);
+			System.out.println("\n==>Protected_Backward" + lifetime);
 			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
 			for (String methodSig : extractor.api2callers.get(lifetime.getSignature()))
 			{
 				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(methodSig).getCls());
 				if (isLibraryMethod)
 				{
-					System.out.println("==>Library:True-->" + lifetime + "-->" + methodSig);
+					System.out.println("--Library:True-->" + lifetime + "-->" + methodSig);
 				}
 				else
 				{
-					System.out.println("==>Library:False-->" + lifetime + "-->" + methodSig);
+					System.out.println("--Library:False-->" + lifetime + "-->" + methodSig);
+					System.out.println(ConditionalCallGraph.obtainCallStack(methodSig));
 				}
 			}
-			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
 		}
 		
 		for (APILife lifetime : problematicAPIs_backward)
 		{
-			System.out.println("==>Problematic_Backward" + lifetime);
+			System.out.println("\n==>Problematic_Backward" + lifetime);
 			System.out.println(extractor.api2callers.get(lifetime.getSignature()));
-			for (String methodSig : extractor.api2callers.get(lifetime.getSignature()))
+			for (String method : extractor.api2callers.get(lifetime.getSignature()))
 			{
-				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(methodSig).getCls());
+				boolean isLibraryMethod = AndroidLibraries.isAndroidLibrary(new MethodSignature(method).getCls());
 				if (isLibraryMethod)
 				{
-					System.out.println("==>Library:True-->" + lifetime + "-->" + methodSig);
+					System.out.println("--Library:True-->" + lifetime + "-->" + method);
 				}
 				else
 				{
-					System.out.println("==>Library:False-->" + lifetime + "-->" + methodSig);
-				}
+					System.out.println("--Library:False-->" + lifetime + "-->" + method);
+					System.out.println(ConditionalCallGraph.obtainCallStack(method));
+				}	
 			}
-			System.out.println(ConditionalCallGraph.obtainCallStack(lifetime.getSignature()));
 		}
 	}
 	

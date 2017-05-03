@@ -171,4 +171,14 @@ org.vi_server.red_screen_2-org.vi_server.red_screen.log:// java.lang.NoSuchMetho
 
 
 
+FicFinder: False Alarms
 
+openDatabase
+
+Added in API level 1
+SQLiteDatabase openDatabase (String path, 
+                SQLiteDatabase.CursorFactory factory, 
+                int flags)
+Open the database according to the flags OPEN_READWRITE OPEN_READONLY CREATE_IF_NECESSARY and/or NO_LOCALIZED_COLLATORS.
+
+Sets the locale of the database to the the system's current locale. Call setLocale(Locale) if you would like something else.

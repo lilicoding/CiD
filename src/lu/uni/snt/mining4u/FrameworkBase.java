@@ -1,16 +1,17 @@
 package lu.uni.snt.mining4u;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lu.uni.snt.mining4u.utils.CommonUtils;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
+
+import lu.uni.snt.mining4u.utils.CommonUtils;
 
 public class FrameworkBase 
 {
@@ -79,6 +80,30 @@ public class FrameworkBase
 				
 				class2SuperClasses.put(currentClsName, superClses);
 			}
+			else if (line.contains(" interface "))
+			{
+				line = line.replaceAll(".*interface ", "");
+				line = currentPkgName + "." + line;
+				line = line.replace("{", "").trim();
+				
+				Set<String> superClses = new HashSet<String>();
+				
+				if (line.contains("implements"))
+				{
+					String[] strs = line.split("implements");
+					line = strs[0].trim();
+					
+					String[] interfaces = strs[1].trim().split(" ");
+					for (String interf : interfaces)
+					{
+						superClses.add(interf);
+					}
+				}
+				
+				currentClsName = line;
+				
+				class2SuperClasses.put(currentClsName, superClses);
+			}
 			else if (line.startsWith("ctor") || line.startsWith("method"))
 			{
 				StringBuilder sb = new StringBuilder();
@@ -124,7 +149,19 @@ public class FrameworkBase
 				String packageName = packageEle.getAttributeValue("name");
 				
 				List<Element> classEles = packageEle.getChildren("class");
-				for (Element classEle : classEles)
+				List<Element> interfaceEles = packageEle.getChildren("interface");
+				
+				List<Element> workList = new ArrayList<Element>();
+				if (classEles != null)
+				{
+					workList.addAll(classEles);
+				}
+				if (interfaceEles != null)
+				{
+					workList.addAll(interfaceEles);
+				}
+				
+				for (Element classEle : workList)
 				{
 					String className = packageName + "." + classEle.getAttributeValue("name");
 

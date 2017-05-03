@@ -152,6 +152,19 @@ public class MethodSignature
 		return this.signature.contains("...");
 	}
 	
+	public boolean containsGenericReturnType()
+	{
+		boolean containsGenericReturnType = false;
+		
+		returnType = returnType.replaceAll("<.+>", "").replaceAll("\\.\\.\\.", "");
+		if (returnType.length() == 1)
+		{
+			containsGenericReturnType = true;
+		}
+		
+		return containsGenericReturnType;
+	}
+	
 	public boolean containsGenericType() 
 	{
 		boolean containsGenericType = false;

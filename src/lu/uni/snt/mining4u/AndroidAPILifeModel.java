@@ -8,12 +8,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import lu.uni.snt.mining4u.api.APILife;
 import lu.uni.snt.mining4u.utils.CommonUtils;
 import lu.uni.snt.mining4u.utils.MethodSignature;
+import soot.Scene;
+import soot.SootClass;
+import soot.SootMethod;
 
 public class AndroidAPILifeModel implements Serializable
 {	
@@ -29,6 +35,8 @@ public class AndroidAPILifeModel implements Serializable
 	//compactSig2Methods = compactSig2Methods_gt U compactSig2Methods_varargs
 	public Map<String, Set<String>> compactSig2Methods_gt = new HashMap<String, Set<String>>();
 	public Map<String, Set<String>> compactSig2Methods_varargs = new HashMap<String, Set<String>>();
+	
+	public Map<String, String> method2inheritedAPIs = new HashMap<String, String>();
 	
 	private static AndroidAPILifeModel instance = null;
 	private static String modelPath = "res/android_api_model.txt";
@@ -111,6 +119,8 @@ public class AndroidAPILifeModel implements Serializable
 	
 	public boolean containsGenericType(String methodSig)
 	{
+		methodSig = methodSig.replace("$", ".");
+		
 		MethodSignature ms = new MethodSignature(methodSig);
 		String compactSig = ms.getCompactSignature();
 		
@@ -124,6 +134,8 @@ public class AndroidAPILifeModel implements Serializable
 	
 	public boolean containsVarargs(String methodSig)
 	{
+		methodSig = methodSig.replace("$", ".");
+		
 		MethodSignature ms = new MethodSignature(methodSig);
 		String compactSig = ms.getCompactSignature();
 		
@@ -144,26 +156,84 @@ public class AndroidAPILifeModel implements Serializable
 	 * @return
 	 */
 	public boolean isAndroidAPI(String methodSig)
-	{
+	{	
+		methodSig = methodSig.replace("$", ".");
+		
 		if (method2APILifes.containsKey(methodSig))
 		{
 			return true;
 		}
-		else if (compactSig2Methods_gt.containsKey(methodSig))
-		{
-			if (Config.DEBUG)
-				System.out.println("[DEBUG] Generic Programming:" + methodSig + " is an Android API with generic type");
+		else 
+		{	
+			String compatMethodSig = new MethodSignature(methodSig).getCompactSignature();
 			
-			return true;
+			if (compactSig2Methods_gt.containsKey(compatMethodSig))
+			{
+				if (Config.DEBUG)
+					System.out.println("[DEBUG] Generic Programming:" + methodSig + " is an Android API with generic type");
+				
+				return true;
+			}
+			else if (compactSig2Methods_varargs.containsKey(compatMethodSig))
+			{
+				if (Config.DEBUG)
+					System.out.println("[DEBUG] Varargs:" + methodSig + " is an Android API with varargs");
+				
+				return true;
+			}
 		}
-		else if (compactSig2Methods_varargs.containsKey(methodSig))
-		{
-			if (Config.DEBUG)
-				System.out.println("[DEBUG] Varargs:" + methodSig + " is an Android API with varargs");
-			
-			return true;
-		}
+		
 
+		return false;
+	}
+	
+	public boolean isInheritedAndroidAPI(String methodSig)
+	{
+		try
+		{
+			SootMethod sootMethod = Scene.v().getMethod(methodSig);
+			
+			SootClass sootClass = sootMethod.getDeclaringClass();
+			
+			List<SootClass> workList = new LinkedList<SootClass>();
+			if (sootClass.hasSuperclass())
+			{
+				workList.add(sootClass.getSuperclass());
+			}
+			for (Iterator<SootClass> iter = sootClass.getInterfaces().snapshotIterator(); iter.hasNext(); )
+			{
+				workList.add(iter.next());
+			}
+			
+			while (! workList.isEmpty())
+			{
+				sootClass = workList.remove(0);
+				
+				String newMethodSig = methodSig.replace("<" + sootMethod.getDeclaringClass().getName() + ":", "<" + sootClass.getName() + ":");
+				
+				if (isAndroidAPI(newMethodSig))
+				{
+					method2inheritedAPIs.put(methodSig, newMethodSig);
+					return true;
+				}
+				else
+				{
+					if (sootClass.hasSuperclass())
+					{
+						workList.add(sootClass.getSuperclass());
+					}
+					for (Iterator<SootClass> iter = sootClass.getInterfaces().snapshotIterator(); iter.hasNext(); )
+					{
+						workList.add(iter.next());
+					}
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			//TODO:
+		}
+		
 		return false;
 	}
 	
@@ -193,26 +263,40 @@ public class AndroidAPILifeModel implements Serializable
 	 */
 	public APILife getLifetime(String methodSignature)
 	{
+		methodSignature = methodSignature.replace("$", ".");
+		
 		APILife apiLife = new APILife(methodSignature, -1, -1);
 		
 		MethodSignature sig = new MethodSignature(methodSignature);
 		
 		if (! method2APILifes.containsKey(methodSignature))
 		{
-			for (String methodSig : compactSig2Methods.get(sig.getCompactSignature()))
+			Set<String> methods = compactSig2Methods.get(sig.getCompactSignature());
+			if (null != methods)
 			{
-				MethodSignature ms = new MethodSignature(methodSig);
-				if (ms.containsGenericType())
+				for (String methodSig : methods)
 				{
-					System.out.println("INFO: GT Found, " + methodSig + "-->" + methodSignature);
-					refine(apiLife, methodSig);
+					MethodSignature ms = new MethodSignature(methodSig);
+					if (ms.containsGenericType())
+					{
+						if (Config.DEBUG)
+							System.out.println("[DEBUG]: GT Found, " + methodSig + "-->" + methodSignature);
+						//refine(apiLife, methodSig);
+					}
+					else
+					{
+						if (Config.DEBUG)
+							System.out.println("[DEBUG]: Varargs Found, " + methodSig + "-->" + methodSignature);
+					}
+					
+					if (ms.containsGenericReturnType() ||
+						ms.getReturnType().equals(sig.getReturnType()))
+					{
+						refine(apiLife, methodSig);
+					}
+					
+					// To be more precise: ms.containsGenericType() && ms.containsVarargs()
 				}
-				else
-				{
-					System.out.println("INFO: Varargs Found, " + methodSig + "-->" + methodSignature);
-					refine(apiLife, methodSig);
-				}
-				// To be more precise: ms.containsGenericType() && ms.containsVarargs()
 			}
 		}
 		else
@@ -239,13 +323,14 @@ public class AndroidAPILifeModel implements Serializable
 			}
 		}
 		
+		
 		MethodSignature sig = new MethodSignature(methodSignature);
 		String cls = sig.getCls();
 		if (class2SuperClasses.containsKey(cls))
 		{
 			for (String superCls : class2SuperClasses.get(cls))
 			{
-				current = refine(current, cls, superCls);
+				current = refine(current, cls, superCls, methodSignature);
 			}
 		}
 		
@@ -253,9 +338,9 @@ public class AndroidAPILifeModel implements Serializable
 	}
 	
 	
-	public APILife refine(APILife current, String currentCls, String superCls)
+	public APILife refine(APILife current, String currentCls, String superCls, String methodSignature)
 	{
-		String newMethodSig = current.getSignature().replace(currentCls + ":", superCls + ":");
+		String newMethodSig = methodSignature.replace(currentCls + ":", superCls + ":");
 		
 		if (method2APILifes.containsKey(newMethodSig))
 		{
@@ -278,7 +363,7 @@ public class AndroidAPILifeModel implements Serializable
 		{
 			for (String superSuperCls : class2SuperClasses.get(superCls))
 			{
-				current = refine(current, currentCls, superSuperCls);
+				current = refine(current, currentCls, superSuperCls, newMethodSig);
 			}
 		}
 		

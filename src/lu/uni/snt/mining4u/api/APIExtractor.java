@@ -44,7 +44,7 @@ public class APIExtractor
 		
 		Mining4UTransformer transformer = new Mining4UTransformer();
 		
-		PackManager.v().getPack("jtp").add(new Transform("jtp.Mining4UTransformer", transformer));
+		PackManager.v().getPack("wjtp").add(new Transform("wjtp.Mining4UTransformer", transformer));
 		soot.Main.main(args);
 		
 		if (apkOrDexPath.endsWith(".apk"))

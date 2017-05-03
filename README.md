@@ -18,7 +18,7 @@ on benchmark apps that take into account several challenges for automatic detect
 CiD takes as input two parameters which are summarized as follows:
 * apkPath: A path points to an Android apk.
 * androidJars: A path points to a directory containing a collection of Android jars, with each one represents each Android platform version.
-Interested users can refer to the [android-platofrms] (https://github.com/lilicoding/android-platforms) project for possible samples.
+Interested users can refer to the [android-platofrms](https://github.com/lilicoding/android-platforms) project for possible samples.
 
 Users can launch CiD through the following script:
 ```

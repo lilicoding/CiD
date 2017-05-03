@@ -12,6 +12,16 @@ lifecycle of the Android APIs and analysing app bytecode to flag usages that can
 the usefulness of CiD by helping developers repair their apps, and we validate that our tool outperforms the state-of-the-art
 on benchmark apps that take into account several challenges for automatic detection.
 
+The following figure depicts the three modules of CiD.  
+The first module, ALM, builds the API lifecyle model based on a mining of Android framework revision history.
+In the second module, AUE, an analysis is performed to locate and extract the usage schema of
+Android APIs in an app. This module considers not only core app code, but also any to-be dynamically
+ loaded code available in the app package. Finally, the analysis keeps a summary of the conditions under which the extracted APIs could be reached.
+Finally, the third module, ACA, evaluates the output of ALM and AUE altogether to flag any potential 
+API compatibility-related issue.
+We provide further details on the working process of these modules in the remainder of this section.
+
+![Approach Overview](cid_overview.pdf)
 
 # Quick Start
 
